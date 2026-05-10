@@ -4,7 +4,7 @@ import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion"
 // ── ASSETS ──────────────────────────────────────────────────────────────────
 const PROFILE_IMG = "/media/profile.jpg";
 const LOGO_IMG = "/media/logo.png";
-const CV_URL      = "https://media.base44.com/files/public/69fc36365a5bcec05c174ea3/ac6817b4e_Ashitosh_G_Pillay_Marketing_Manager_CV.pdf";
+const CV_URL      = "/media/Ashitosh_G_Pillay_Marketing_Manager_CV.pdf";
 const ENVELOPE_IMG= "https://media.base44.com/images/public/69fc36365a5bcec05c174ea3/a0b05ef02_generated_ef567214.png";
 
 // ── GLOBAL STYLES ─────────────────────────────────────────────────────────────
