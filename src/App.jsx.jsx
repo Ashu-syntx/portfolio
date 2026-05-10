@@ -938,12 +938,16 @@ function ReelEmbed({code,idx}){
           <motion.div initial={{scale:.9,opacity:0}} animate={{scale:1,opacity:1}} onClick={e=>e.stopPropagation()}
             style={{position:"relative",width:"min(400px,90vw)",aspectRatio:"9/16"}}>
             <button onClick={()=>setLight(false)} style={{position:"absolute",top:-14,right:-14,zIndex:10,width:32,height:32,background:"var(--card)",border:"2px solid var(--border)",color:"var(--fg)",fontSize:16,display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
-            <iframe src={`https://www.instagram.com/p/${code}/embed/`} style={{width:"100%",height:"100%",border:"none"}} allowFullScreen title={`reel-${idx}`}/>
+            <iframe src={`https://www.instagram.com/p/${code}/embed/?hidecaption=true&cr=1&v=14`} style={{width:"100%",height:"100%",border:"none"}} allowFullScreen title={`reel-${idx}`}/>
           </motion.div>
         </motion.div>
       )}
       <div onClick={()=>setLight(true)} style={{position:"relative",aspectRatio:"9/16",background:"var(--muted)",border:"2px solid var(--border)",overflow:"hidden",cursor:"pointer"}}>
-        <iframe src={`https://www.instagram.com/p/${code}/embed/`} style={{width:"100%",height:"100%",border:"none",pointerEvents:"none"}} title={`reel-thumb-${idx}`}/>
+        <div style={{position:"absolute",inset:0,overflow:"hidden"}}>
+          <iframe src={`https://www.instagram.com/p/${code}/embed/?hidecaption=true&cr=1&v=14`} 
+            style={{width:"100%",height:"130%",border:"none",pointerEvents:"none",marginTop:"-15%"}} 
+            title={`reel-thumb-${idx}`}/>
+        </div>
         <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(0,0,0,0)",transition:"background .2s"}}
           onMouseEnter={e=>e.currentTarget.style.background="rgba(0,0,0,.4)"}
           onMouseLeave={e=>e.currentTarget.style.background="rgba(0,0,0,0)"}>
