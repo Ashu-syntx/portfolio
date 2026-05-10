@@ -77,7 +77,7 @@ const TRACKS=[
   {title:"tokyo lofi vibes",artist:"Lofi Radio",url:"https://www.youtube.com/embed/DWcJFNfaw9c?autoplay=1&controls=0"},
 ];
 function StickyLofi(){
-  const[playing,setPlaying]=useState(false);
+  const[playing,setPlaying]=useState(true);
   const[muted,setMuted]=useState(false);
   const[vol,setVol]=useState(60);
   const[idx,setIdx]=useState(0);
@@ -126,7 +126,7 @@ function StickyLofi(){
 }
 
 // ── NAVBAR ────────────────────────────────────────────────────────────────────
-function Navbar(){
+function Navbar({onHome}){
   const[scrolled,setScrolled]=useState(false);
   const[mob,setMob]=useState(false);
   const[isMobile,setIsMobile]=useState(()=>typeof window!=="undefined"&&window.innerWidth<900);
@@ -154,7 +154,7 @@ function Navbar(){
         <div style={{maxWidth:1280,margin:"0 auto",padding:"0 32px",display:"flex",alignItems:"center",justifyContent:"space-between",height:64}}>
 
           {/* Logo — always visible */}
-          <a href="#hero" style={{display:"flex",alignItems:"center",gap:12,flexShrink:0}}>
+          <a href="#hero" onClick={e=>{if(onHome){e.preventDefault();onHome()}}} style={{display:"flex",alignItems:"center",gap:12,flexShrink:0,cursor:"pointer"}}>
             <img src={LOGO_IMG} alt="Truthseeker Logo" style={{width:36,height:36,objectFit:"contain"}} onError={e=>e.target.style.display="none"}/>
             <span style={{fontFamily:"var(--px)",fontSize:10,color:"var(--fg)"}}>{isMobile?"AP":"ASHITOSH.PILLAY"}</span>
           </a>
@@ -198,7 +198,8 @@ function Navbar(){
             style={{position:"fixed",top:64,left:0,right:0,zIndex:30,background:"rgba(13,13,18,.98)",borderBottom:"2px solid var(--border)",backdropFilter:"blur(12px)"}}>
             <nav style={{display:"flex",flexDirection:"column",padding:16,gap:4}}>
               {links.map(({l,h})=>(
-                <a key={l} href={h} onClick={()=>setMob(false)}
+                <a key={l} href={h}
+                  onClick={e=>{setMob(false);if(onHome){e.preventDefault();onHome();setTimeout(()=>{const el=document.querySelector(h);if(el)el.scrollIntoView({behavior:"smooth"})},100)}}}
                   style={{fontFamily:"var(--mo)",fontSize:13,textTransform:"uppercase",padding:"12px 16px",color:"var(--mfg)"}}>
                   {l}
                 </a>
@@ -234,7 +235,7 @@ function SplineEmbed(){
     <div style={{width:"100%",height:"100%",position:"absolute",inset:0}}
       dangerouslySetInnerHTML={{__html:`
         <spline-viewer
-          url="https://prod.spline.design/rfHanaXHuEYqtVyP/scene.splinecode"
+          url="https://prod.spline.design/ETx9a6NYIE494mSb/scene.splinecode"
           style="width:100%;height:100%;background:transparent;"
         ></spline-viewer>
       `}}
@@ -928,7 +929,7 @@ function MediaSlot({slotKey,type="image",idx}){
 
 // ── PORTFOLIO SUB-PAGES ───────────────────────────────────────────────────────
 // Instagram reel — clean thumbnail + fullscreen lightbox
-function ReelEmbed({code,idx}){
+function ReelEmbed({code,idx,title}){
   const[light,setLight]=useState(false);
   // Use Instagram's thumbnail API for clean cover image
   const thumb=`https://www.instagram.com/p/${code}/media/?size=l`;
@@ -952,32 +953,34 @@ function ReelEmbed({code,idx}){
           </motion.div>
         )}
       </AnimatePresence>
-      {/* Thumbnail card — no iframe, just a clean cover */}
+      {/* Thumbnail card — Instagram cover image + play overlay */}
       <div onClick={()=>setLight(true)}
         style={{position:"relative",aspectRatio:"9/16",background:"var(--muted)",border:"2px solid var(--border)",overflow:"hidden",cursor:"pointer",transition:"border-color .2s"}}
         onMouseEnter={e=>e.currentTarget.style.borderColor="var(--primary)"}
         onMouseLeave={e=>e.currentTarget.style.borderColor="var(--border)"}>
-        {/* Dark gradient bg with IG logo as fallback */}
-        <div style={{position:"absolute",inset:0,background:"linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:12}}>
-          <div style={{width:56,height:56,borderRadius:"50%",background:"linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:24}}>
-            📸
-          </div>
-          <span style={{fontFamily:"var(--mo)",fontSize:10,color:"rgba(255,255,255,.6)",textTransform:"uppercase",letterSpacing:2}}>Instagram Reel</span>
+        {/* Instagram embed as thumbnail — cropped to hide bottom bar */}
+        <div style={{position:"absolute",inset:"0 0 -25% 0",overflow:"hidden",pointerEvents:"none"}}>
+          <iframe
+            src={`https://www.instagram.com/p/${code}/embed/?hidecaption=true`}
+            style={{width:"100%",height:"133%",border:"none",display:"block"}}
+            title={`thumb-${code}`}
+            loading="lazy"
+          />
         </div>
-        {/* Big play button overlay */}
-        <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center"}}>
-          <motion.div whileHover={{scale:1.1}} style={{width:56,height:56,background:"var(--primary)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,color:"var(--pfg)",fontWeight:700,boxShadow:"0 0 20px rgba(196,255,77,.4)"}}>
-            ▶
-          </motion.div>
+        {/* Dark overlay on hover */}
+        <div style={{position:"absolute",inset:0,background:"rgba(0,0,0,.25)",transition:"background .2s"}}
+          onMouseEnter={e=>e.currentTarget.style.background="rgba(0,0,0,.55)"}
+          onMouseLeave={e=>e.currentTarget.style.background="rgba(0,0,0,.25)"}/>
+        {/* Play button */}
+        <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",pointerEvents:"none"}}>
+          <div style={{width:52,height:52,background:"rgba(196,255,77,.92)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,color:"#000",fontWeight:700}}>▶</div>
         </div>
-        {/* Reel number badge */}
-        <div style={{position:"absolute",bottom:8,left:8,fontFamily:"var(--mo)",fontSize:9,color:"rgba(255,255,255,.5)",background:"rgba(0,0,0,.5)",padding:"3px 8px"}}>
-          REEL_{String(idx+1).padStart(2,"0")}
-        </div>
+        {/* Title label */}
+        {title&&<div style={{position:"absolute",bottom:0,left:0,right:0,background:"linear-gradient(to top,rgba(0,0,0,.85),transparent)",padding:"20px 10px 8px",fontFamily:"var(--mo)",fontSize:9,color:"rgba(255,255,255,.9)",lineHeight:1.4,pointerEvents:"none"}}>
+          {title}
+        </div>}
         {/* Expand icon */}
-        <div style={{position:"absolute",top:6,right:6,width:26,height:26,background:"rgba(13,13,18,.8)",border:"1px solid rgba(255,255,255,.1)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,color:"rgba(255,255,255,.5)"}}>
-          ⤢
-        </div>
+        <div style={{position:"absolute",top:6,right:6,width:26,height:26,background:"rgba(13,13,18,.7)",border:"1px solid rgba(255,255,255,.15)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,color:"rgba(255,255,255,.7)",pointerEvents:"none"}}>⤢</div>
       </div>
     </>
   );
@@ -1008,7 +1011,7 @@ function PortfolioSubPage({title,emoji,description,sections,type,onBack}){
               <p style={{fontFamily:"var(--mo)",fontSize:11,color:"var(--mfg)",marginBottom:20}}>{sec.description}</p>
               {sec.reels?(
                 <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12}}>
-                  {sec.reels.map((code,j)=><ReelEmbed key={code} code={code} idx={j}/>)}
+                  {sec.reels.map((r,j)=><ReelEmbed key={r.code||r} code={r.code||r} title={r.title||""} idx={j}/>)}
                 </div>
               ):(
                 <div style={{display:"grid",gridTemplateColumns:`repeat(${sec.count<=4?2:3},1fr)`,gap:12}}>
@@ -1089,16 +1092,30 @@ const PP={
     {title:"Wildlife",description:"Nature and wildlife photography from personal travels and expeditions.",count:4},
   ]},
   video:{title:"Video_Editing",emoji:"🎬",description:"Short-form video, reels, and edited content produced with Adobe Premiere Pro, CapCut and DJI gimbal.",type:"video",sections:[
-    {title:"Social Media Content",description:"Reels, TikToks, YouTube shorts and branded short-form video.",count:6,reels:["DX_0plvAffO","DXoqGS_Deah","DX9GRJORFc5","DXopMxxkZ6x","DWOa6CRke_P","DJoIjVihzoE"]},
-    {title:"Personal Projects",description:"Personal creative video projects, experimental edits, and passion projects.",count:4,reels:["DSFNWYjkneE","DRSHbnSCoUO","C9fEZz4N624","C7KqzwQypTp"]},
+    {title:"Social Media Content",description:"Reels, TikToks, YouTube shorts and branded short-form video.",count:6,
+    reels:[
+      {code:"DX_0plvAffO",title:"Fortezza — Meet The Team"},
+      {code:"DXoqGS_Deah",title:"Fortezza Interiors — Brand Reel"},
+      {code:"DX9GRJORFc5",title:"Spartan Athletique — Product Reel"},
+      {code:"DXopMxxkZ6x",title:"Spartan Athletique — Training Reel"},
+      {code:"DWOa6CRke_P",title:"Fortezza — Design Showcase"},
+      {code:"DJoIjVihzoE",title:"Spartan Athletique — Brand Story"},
+    ]},
+    {title:"Personal Projects",description:"Personal creative video projects, experimental edits, and passion projects.",count:4,
+    reels:[
+      {code:"DSFNWYjkneE",title:"Personal Creative Edit"},
+      {code:"DRSHbnSCoUO",title:"Personal Project"},
+      {code:"C9fEZz4N624",title:"Creative Edit"},
+      {code:"C7KqzwQypTp",title:"Personal Reel"},
+    ]},
   ]},
 };
 
 export default function App(){
   const[page,setPage]=useState("home");
   useEffect(()=>{window.scrollTo(0,0)},[page]);
-  if(page==="websites") return(<><G/><Navbar/><WebsitesPage onBack={()=>setPage("home")}/><StickyLofi/></>);
-  if(PP[page]){const p=PP[page];return(<><G/><Navbar/><PortfolioSubPage {...p} onBack={()=>setPage("home")}/><StickyLofi/></>);}
+  if(page==="websites") return(<><G/><Navbar onHome={()=>setPage("home")}/><WebsitesPage onBack={()=>setPage("home")}/><StickyLofi/></>);
+  if(PP[page]){const p=PP[page];return(<><G/><Navbar onHome={()=>setPage("home")}/><PortfolioSubPage {...p} onBack={()=>setPage("home")}/><StickyLofi/></>);}
   return(
     <><G/><Navbar/>
       <div style={{minHeight:"100vh",background:"var(--bg)",color:"var(--fg)"}}>
