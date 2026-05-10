@@ -748,6 +748,35 @@ function Footer(){
   );
 }
 
+// ── HARDCODED IMAGE SLOT ────────────────────────────────────────────────────
+function ImgSlot({src}){
+  const[light,setLight]=useState(false);
+  return(
+    <>
+      <AnimatePresence>
+        {light&&(
+          <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} onClick={()=>setLight(false)}
+            style={{position:"fixed",inset:0,zIndex:999,background:"rgba(0,0,0,.95)",backdropFilter:"blur(16px)",display:"flex",alignItems:"center",justifyContent:"center",padding:16}}>
+            <motion.div initial={{scale:.9,opacity:0}} animate={{scale:1,opacity:1}} exit={{scale:.9,opacity:0}} onClick={e=>e.stopPropagation()}
+              style={{position:"relative",maxWidth:"90vw",maxHeight:"90vh"}}>
+              <button onClick={()=>setLight(false)} style={{position:"absolute",top:-14,right:-14,zIndex:10,width:32,height:32,background:"var(--card)",border:"2px solid var(--border)",color:"var(--fg)",fontSize:16,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}>✕</button>
+              <img src={src} alt="" style={{maxWidth:"88vw",maxHeight:"85vh",objectFit:"contain",display:"block",border:"2px solid var(--border)"}}/>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <div onClick={()=>setLight(true)} style={{position:"relative",aspectRatio:"1",overflow:"hidden",border:"2px solid var(--border)",cursor:"zoom-in",transition:"border-color .2s"}}
+        onMouseEnter={e=>e.currentTarget.style.borderColor="var(--primary)"}
+        onMouseLeave={e=>e.currentTarget.style.borderColor="var(--border)"}>
+        <img src={src} alt="" style={{width:"100%",height:"100%",objectFit:"cover",transition:"transform .3s"}}
+          onMouseEnter={e=>e.target.style.transform="scale(1.06)"}
+          onMouseLeave={e=>e.target.style.transform="scale(1)"}/>
+        <div style={{position:"absolute",top:6,right:6,width:26,height:26,background:"rgba(13,13,18,.7)",border:"1px solid rgba(255,255,255,.15)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,color:"rgba(255,255,255,.7)",pointerEvents:"none"}}>⤢</div>
+      </div>
+    </>
+  );
+}
+
 // ── MEDIA SYSTEM: localStorage + lightbox + video player ─────────────────────
 const SK="ap_portfolio_v2";
 function loadMedia(){try{return JSON.parse(localStorage.getItem(SK)||"{}")}catch{return{}}}
@@ -927,80 +956,48 @@ function MediaSlot({slotKey,type="image",idx}){
   );
 }
 
-// ── PORTFOLIO SUB-PAGES ───────────────────────────────────────────────────────
-// Instagram reel — clean thumbnail + fullscreen lightbox
-function ReelEmbed({code,idx,title}){
-  const[light,setLight]=useState(false);
-  // Use Instagram's thumbnail API for clean cover image
-  const thumb=`https://www.instagram.com/p/${code}/media/?size=l`;
-  return(
-    <>
-      <AnimatePresence>
-        {light&&(
-          <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} onClick={()=>setLight(false)}
-            style={{position:"fixed",inset:0,zIndex:999,background:"rgba(0,0,0,.95)",backdropFilter:"blur(16px)",display:"flex",alignItems:"center",justifyContent:"center",padding:16}}>
-            <motion.div initial={{scale:.9,opacity:0,y:20}} animate={{scale:1,opacity:1,y:0}} exit={{scale:.9,opacity:0}} onClick={e=>e.stopPropagation()}
-              style={{position:"relative",width:"min(380px,90vw)",aspectRatio:"9/16"}}>
-              <button onClick={()=>setLight(false)}
-                style={{position:"absolute",top:-14,right:-14,zIndex:10,width:32,height:32,background:"var(--card)",border:"2px solid var(--border)",color:"var(--fg)",fontSize:16,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}>
-                ✕
-              </button>
-              <iframe
-                src={`https://www.instagram.com/p/${code}/embed/?hidecaption=true`}
-                style={{width:"100%",height:"100%",border:"none"}}
-                allowFullScreen title={`reel-${idx}`}/>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-      {/* Thumbnail card — Instagram cover image + play overlay */}
-      <div onClick={()=>setLight(true)}
-        style={{position:"relative",aspectRatio:"9/16",background:"var(--muted)",border:"2px solid var(--border)",overflow:"hidden",cursor:"pointer",transition:"border-color .2s"}}
-        onMouseEnter={e=>e.currentTarget.style.borderColor="var(--primary)"}
-        onMouseLeave={e=>e.currentTarget.style.borderColor="var(--border)"}>
-        {/* Instagram embed as thumbnail — cropped to hide bottom bar */}
-        <div style={{position:"absolute",inset:"0 0 -25% 0",overflow:"hidden",pointerEvents:"none"}}>
-          <iframe
-            src={`https://www.instagram.com/p/${code}/embed/?hidecaption=true`}
-            style={{width:"100%",height:"133%",border:"none",display:"block"}}
-            title={`thumb-${code}`}
-            loading="lazy"
-          />
-        </div>
-        {/* Dark overlay on hover */}
-        <div style={{position:"absolute",inset:0,background:"rgba(0,0,0,.25)",transition:"background .2s"}}
-          onMouseEnter={e=>e.currentTarget.style.background="rgba(0,0,0,.55)"}
-          onMouseLeave={e=>e.currentTarget.style.background="rgba(0,0,0,.25)"}/>
-        {/* Play button */}
-        <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",pointerEvents:"none"}}>
-          <div style={{width:52,height:52,background:"rgba(196,255,77,.92)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,color:"#000",fontWeight:700}}>▶</div>
-        </div>
-        {/* Title label */}
-        {title&&<div style={{position:"absolute",bottom:0,left:0,right:0,background:"linear-gradient(to top,rgba(0,0,0,.85),transparent)",padding:"20px 10px 8px",fontFamily:"var(--mo)",fontSize:9,color:"rgba(255,255,255,.9)",lineHeight:1.4,pointerEvents:"none"}}>
-          {title}
-        </div>}
-        {/* Expand icon */}
-        <div style={{position:"absolute",top:6,right:6,width:26,height:26,background:"rgba(13,13,18,.7)",border:"1px solid rgba(255,255,255,.15)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,color:"rgba(255,255,255,.7)",pointerEvents:"none"}}>⤢</div>
-      </div>
-    </>
-  );
-}
+// ── HARDCODED PORTFOLIO PAGES ────────────────────────────────────────────────
 
-function PortfolioSubPage({title,emoji,description,sections,type,onBack}){
+function DesignPage({onBack}){
+  const sections=[
+    {title:"Photo Manipulations",description:"Creative photo composites and digital art edits.",imgs:[
+      "/media/design/manipulations/manipulations (1).jpg",
+      "/media/design/manipulations/manipulations (2).jpg",
+      "/media/design/manipulations/manipulations (3).jpg",
+      "/media/design/manipulations/manipulations (4).jpg",
+    ]},
+    {title:"Office & Corporate Assets",description:"Business cards, pitch decks, presentations, and internal communication materials.",imgs:[
+      "/media/design/corporate/corporate (1).png",
+      "/media/design/corporate/corporate (2).png",
+      "/media/design/corporate/corporate (3).png",
+    ]},
+    {title:"Social Media Design",description:"Instagram posts, carousels, stories, LinkedIn banners, and TikTok graphics.",imgs:[
+      "/media/design/social-media/social-media (1).jpg",
+      "/media/design/social-media/social-media (1).png",
+      "/media/design/social-media/social-media (2).jpg",
+      "/media/design/social-media/social-media (2).png",
+      "/media/design/social-media/social-media (3).jpg",
+      "/media/design/social-media/social-media (3).png",
+      "/media/design/social-media/social-media (4).jpg",
+      "/media/design/social-media/social-media (5).jpg",
+      "/media/design/social-media/social-media (6).jpg",
+      "/media/design/social-media/social-media (7).jpg",
+      "/media/design/social-media/social-media (8).jpg",
+      "/media/design/social-media/social-media (9).jpg",
+    ]},
+  ];
   return(
     <div style={{minHeight:"100vh",background:"var(--bg)",color:"var(--fg)",paddingTop:80}}>
       <div style={{maxWidth:1280,margin:"0 auto",padding:"32px 32px"}}>
-        <button onClick={onBack} style={{display:"inline-flex",alignItems:"center",gap:8,fontFamily:"var(--mo)",fontSize:11,color:"var(--mfg)",background:"none",marginBottom:32}}
+        <button onClick={onBack} style={{display:"inline-flex",alignItems:"center",gap:8,fontFamily:"var(--mo)",fontSize:11,color:"var(--mfg)",background:"none",marginBottom:32,cursor:"pointer"}}
           onMouseEnter={e=>e.currentTarget.style.color="var(--primary)"}
-          onMouseLeave={e=>e.currentTarget.style.color="var(--mfg)"}>
-          ← Back to Portfolio
-        </button>
+          onMouseLeave={e=>e.currentTarget.style.color="var(--mfg)"}>← Back to Portfolio</button>
         <div style={{display:"flex",alignItems:"center",gap:16,marginBottom:12}}>
-          <span>{emoji}</span>
-          <h1 style={{fontFamily:"var(--px)",fontSize:13,textTransform:"uppercase"}}>{title}</h1>
+          <span>🎨</span>
+          <h1 style={{fontFamily:"var(--px)",fontSize:13,textTransform:"uppercase"}}>Design_Work</h1>
           <div style={{flex:1,height:1,background:"var(--border)"}}/>
         </div>
-        <p style={{fontFamily:"var(--mo)",fontSize:13,color:"var(--mfg)",marginBottom:40,maxWidth:600}}>{description}</p>
+        <p style={{fontFamily:"var(--mo)",fontSize:13,color:"var(--mfg)",marginBottom:40,maxWidth:600}}>Brand identity, social media graphics, event collateral, and visual design across multiple clients and platforms.</p>
         <div style={{display:"flex",flexDirection:"column",gap:64}}>
           {sections.map((sec,i)=>(
             <motion.div key={sec.title} initial={{opacity:0,y:30}} animate={{opacity:1,y:0}} transition={{duration:.5,delay:i*.1}}>
@@ -1009,17 +1006,70 @@ function PortfolioSubPage({title,emoji,description,sections,type,onBack}){
                 <div style={{flex:1,height:1,background:"var(--border)"}}/>
               </div>
               <p style={{fontFamily:"var(--mo)",fontSize:11,color:"var(--mfg)",marginBottom:20}}>{sec.description}</p>
-              {sec.reels?(
-                <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12}}>
-                  {sec.reels.map((r,j)=><ReelEmbed key={r.code||r} code={r.code||r} title={r.title||""} idx={j}/>)}
-                </div>
-              ):(
-                <div style={{display:"grid",gridTemplateColumns:`repeat(${sec.count<=4?2:3},1fr)`,gap:12}}>
-                  {Array.from({length:sec.count}).map((_,j)=>(
-                    <MediaSlot key={`${type}-${sec.title}-${j}`} slotKey={`${type}-${sec.title}-${j}`} type="image" idx={j}/>
-                  ))}
-                </div>
-              )}
+              <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12}}>
+                {sec.imgs.map((src,j)=><ImgSlot key={j} src={src}/>)}
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PhotographyPage({onBack}){
+  const sections=[
+    {title:"Event Photography",description:"Corporate events, trade shows, product launches, and live experiences. Shot on Canon.",imgs:[
+      "/media/photography/event/Event-1.jpg",
+      "/media/photography/event/Event-2.jpg",
+      "/media/photography/event/Event-3.jpg",
+      "/media/photography/event/Event-4.jpg",
+      "/media/photography/event/Event-5.jpg",
+      "/media/photography/event/Event-6.jpg",
+    ]},
+    {title:"Portrait",description:"Professional and lifestyle portraits — clients, brand ambassadors, team shoots.",imgs:[
+      "/media/photography/Potrait/Portrait-1.jpg",
+      "/media/photography/Potrait/Portrait-2.JPG",
+      "/media/photography/Potrait/Portrait-3.JPG",
+      "/media/photography/Potrait/Portrait-4.jpg",
+      "/media/photography/Potrait/Portrait-5.jpg",
+    ]},
+    {title:"Interior & Commercial",description:"Commercial and interior photography for brands, studios, and hospitality clients.",imgs:[
+      "/media/photography/interior-gym/street (1).jpg",
+      "/media/photography/interior-gym/street (2).jpg",
+      "/media/photography/interior-gym/street (3).jpg",
+      "/media/photography/interior-gym/street (4).jpg",
+    ]},
+    {title:"Wildlife",description:"Nature and wildlife photography from personal travels and expeditions.",imgs:[
+      "/media/photography/wildlife/wildlife (1).jpg",
+      "/media/photography/wildlife/wildlife (2).jpg",
+      "/media/photography/wildlife/wildlife (3).jpg",
+      "/media/photography/wildlife/wildlife (4).jpg",
+    ]},
+  ];
+  return(
+    <div style={{minHeight:"100vh",background:"var(--bg)",color:"var(--fg)",paddingTop:80}}>
+      <div style={{maxWidth:1280,margin:"0 auto",padding:"32px 32px"}}>
+        <button onClick={onBack} style={{display:"inline-flex",alignItems:"center",gap:8,fontFamily:"var(--mo)",fontSize:11,color:"var(--mfg)",background:"none",marginBottom:32,cursor:"pointer"}}
+          onMouseEnter={e=>e.currentTarget.style.color="var(--primary)"}
+          onMouseLeave={e=>e.currentTarget.style.color="var(--mfg)"}>← Back to Portfolio</button>
+        <div style={{display:"flex",alignItems:"center",gap:16,marginBottom:12}}>
+          <span>📷</span>
+          <h1 style={{fontFamily:"var(--px)",fontSize:13,textTransform:"uppercase"}}>Photography</h1>
+          <div style={{flex:1,height:1,background:"var(--border)"}}/>
+        </div>
+        <p style={{fontFamily:"var(--mo)",fontSize:13,color:"var(--mfg)",marginBottom:40,maxWidth:600}}>Commercial and personal photography shot on Canon EOS. Events, portraits, interior & commercial, and wildlife.</p>
+        <div style={{display:"flex",flexDirection:"column",gap:64}}>
+          {sections.map((sec,i)=>(
+            <motion.div key={sec.title} initial={{opacity:0,y:30}} animate={{opacity:1,y:0}} transition={{duration:.5,delay:i*.1}}>
+              <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:20}}>
+                <h2 style={{fontFamily:"var(--mo)",fontSize:13,fontWeight:700,textTransform:"uppercase",letterSpacing:2}}>{sec.title}</h2>
+                <div style={{flex:1,height:1,background:"var(--border)"}}/>
+              </div>
+              <p style={{fontFamily:"var(--mo)",fontSize:11,color:"var(--mfg)",marginBottom:20}}>{sec.description}</p>
+              <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12}}>
+                {sec.imgs.map((src,j)=><ImgSlot key={j} src={src}/>)}
+              </div>
             </motion.div>
           ))}
         </div>
@@ -1030,37 +1080,41 @@ function PortfolioSubPage({title,emoji,description,sections,type,onBack}){
 
 function WebsitesPage({onBack}){
   const projects=[
-    {id:1,name:"Spartan Athletique",desc:"Full e-commerce and brand website for a premium fitness equipment company in Dubai. Built from scratch — Wix MVP to custom WordPress with integrated product catalogue, payment gateways, Zoho CRM, and lead capture automation.",url:"https://spartanathletique.com"},
-    {id:2,name:"Fortezza Technical Services",desc:"Corporate website for a luxury interiors and technical fit-out company in Dubai. Focused on B2B lead generation, brand positioning and Google Business Profile optimisation.",url:"https://fortezzatechnical.com"},
-    {id:3,name:"Cruising Club India",desc:"Marketing and event landing pages for a luxury yacht events company in Goa. Campaign-focused pages built for enquiry capture across yacht parties, weddings and private events.",url:""},
-    {id:4,name:"This Portfolio",desc:"My personal portfolio website — designed and built to showcase my marketing, creative, and brand work. Built on React with a pixel-art aesthetic, Spline 3D background, and full project showcase.",url:""},
+    {id:1,name:"Spartan Athletique",desc:"Full e-commerce and brand website for a premium fitness equipment company in Dubai. Built from scratch — Wix MVP to custom WordPress with integrated product catalogue, payment gateways, Zoho CRM, and lead capture automation.",url:"https://spartanathletique.com",imgs:[
+      "/media/websites/Spartan-athletique/Screenshot 2026-05-10 225214.png",
+      "/media/websites/Spartan-athletique/Screenshot 2026-05-10 225242.png",
+      "/media/websites/Spartan-athletique/Screenshot 2026-05-10 225300.png",
+    ]},
+    {id:2,name:"Fortezza Technical Services",desc:"Corporate website for a luxury interiors and technical fit-out company in Dubai. Focused on B2B lead generation, brand positioning and Google Business Profile optimisation.",url:"https://fortezzatechnical.com",imgs:[
+      "/media/websites/Fortezza-Interiors/Screenshot 2026-05-10 225417.png",
+      "/media/websites/Fortezza-Interiors/Screenshot 2026-05-10 225438.png",
+      "/media/websites/Fortezza-Interiors/Screenshot 2026-05-10 225459.png",
+      "/media/websites/Fortezza-Interiors/Screenshot 2026-05-10 225521.png",
+    ]},
+    {id:3,name:"Cruising Club India",desc:"Marketing and event landing pages for a luxury yacht events company in Goa. Campaign-focused pages built for enquiry capture across yacht parties, weddings and private events.",url:"",imgs:[]},
+    {id:4,name:"This Portfolio",desc:"My personal portfolio website — designed and built to showcase my marketing, creative, and brand work. Built on React with a pixel-art aesthetic, Spline 3D background, and full project showcase.",url:"",imgs:[]},
   ];
   return(
     <div style={{minHeight:"100vh",background:"var(--bg)",color:"var(--fg)",paddingTop:80}}>
       <div style={{maxWidth:1280,margin:"0 auto",padding:"32px 32px"}}>
-        <button onClick={onBack} style={{display:"inline-flex",alignItems:"center",gap:8,fontFamily:"var(--mo)",fontSize:11,color:"var(--mfg)",background:"none",marginBottom:32}}
+        <button onClick={onBack} style={{display:"inline-flex",alignItems:"center",gap:8,fontFamily:"var(--mo)",fontSize:11,color:"var(--mfg)",background:"none",marginBottom:32,cursor:"pointer"}}
           onMouseEnter={e=>e.currentTarget.style.color="var(--primary)"}
-          onMouseLeave={e=>e.currentTarget.style.color="var(--mfg)"}>
-          ← Back to Portfolio
-        </button>
+          onMouseLeave={e=>e.currentTarget.style.color="var(--mfg)"}>← Back to Portfolio</button>
         <div style={{display:"flex",alignItems:"center",gap:16,marginBottom:12}}>
           <span>🌐</span>
           <h1 style={{fontFamily:"var(--px)",fontSize:13,textTransform:"uppercase"}}>Website_Design</h1>
           <div style={{flex:1,height:1,background:"var(--border)"}}/>
         </div>
-        <p style={{fontFamily:"var(--mo)",fontSize:13,color:"var(--mfg)",marginBottom:16,maxWidth:600}}>Websites I've built, managed or contributed to — from e-commerce platforms to corporate and portfolio sites.</p>
-        <div style={{marginBottom:48,display:"inline-flex",alignItems:"center",gap:8,fontFamily:"var(--mo)",fontSize:10,color:"var(--primary)",background:"rgba(196,255,77,.06)",border:"1px solid rgba(196,255,77,.25)",padding:"6px 12px"}}>
-          ✏️ Click any slot to upload screenshots — saves in your browser automatically
-        </div>
+        <p style={{fontFamily:"var(--mo)",fontSize:13,color:"var(--mfg)",marginBottom:40,maxWidth:600}}>Websites I've built, managed or contributed to — from e-commerce platforms to corporate and portfolio sites.</p>
         <div style={{display:"flex",flexDirection:"column",gap:80}}>
           {projects.map((p,i)=>(
             <motion.div key={p.id} initial={{opacity:0,y:30}} animate={{opacity:1,y:0}} transition={{duration:.5,delay:i*.1}}
-              className="ws-grid" style={{display:"grid",gridTemplateColumns:"3fr 2fr",gap:32,alignItems:"start"}}>
-              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
-                {Array.from({length:4}).map((_,j)=>(
-                  <MediaSlot key={`websites-${p.name}-${j}`} slotKey={`websites-${p.name}-${j}`} type="image" idx={j}/>
-                ))}
-              </div>
+              style={{display:"grid",gridTemplateColumns:p.imgs.length?"3fr 2fr":"1fr",gap:32,alignItems:"start"}}>
+              {p.imgs.length>0&&(
+                <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:12}}>
+                  {p.imgs.map((src,j)=><ImgSlot key={j} src={src}/>)}
+                </div>
+              )}
               <div style={{display:"flex",flexDirection:"column",gap:16}}>
                 <div>
                   <div style={{fontFamily:"var(--mo)",fontSize:10,color:"var(--primary)",letterSpacing:3,marginBottom:4}}>Project {String(i+1).padStart(2,"0")}</div>
@@ -1115,6 +1169,8 @@ export default function App(){
   const[page,setPage]=useState("home");
   useEffect(()=>{window.scrollTo(0,0)},[page]);
   if(page==="websites") return(<><G/><Navbar onHome={()=>setPage("home")}/><WebsitesPage onBack={()=>setPage("home")}/><StickyLofi/></>);
+  if(page==="design") return(<><G/><Navbar onHome={()=>setPage("home")}/><DesignPage onBack={()=>setPage("home")}/><StickyLofi/></>);
+  if(page==="photography") return(<><G/><Navbar onHome={()=>setPage("home")}/><PhotographyPage onBack={()=>setPage("home")}/><StickyLofi/></>);
   if(PP[page]){const p=PP[page];return(<><G/><Navbar onHome={()=>setPage("home")}/><PortfolioSubPage {...p} onBack={()=>setPage("home")}/><StickyLofi/></>);}
   return(
     <><G/><Navbar/>
