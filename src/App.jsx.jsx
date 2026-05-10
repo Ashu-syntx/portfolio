@@ -220,15 +220,24 @@ function Navbar(){
 }
 
 // ── SPLINE ────────────────────────────────────────────────────────────────────
-// iframe embed is the most reliable cross-framework approach — no npm needed
 function SplineEmbed(){
+  useEffect(()=>{
+    if(!document.querySelector('script[data-spline]')){
+      const s=document.createElement("script");
+      s.type="module";
+      s.src="https://unpkg.com/@splinetool/viewer@1.12.92/build/spline-viewer.js";
+      s.setAttribute("data-spline","1");
+      document.head.appendChild(s);
+    }
+  },[]);
   return(
-    <iframe
-      src="https://my.spline.design/rfHanaXHuEYqtVyP/"
-      frameBorder="0"
-      title="3D Background"
-      style={{width:"100%",height:"100%",border:"none",background:"transparent",pointerEvents:"auto"}}
-      allow="autoplay"
+    <div style={{width:"100%",height:"100%",position:"absolute",inset:0}}
+      dangerouslySetInnerHTML={{__html:`
+        <spline-viewer
+          url="https://prod.spline.design/rfHanaXHuEYqtVyP/scene.splinecode"
+          style="width:100%;height:100%;background:transparent;"
+        ></spline-viewer>
+      `}}
     />
   );
 }
