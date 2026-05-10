@@ -927,6 +927,36 @@ function MediaSlot({slotKey,type="image",idx}){
 }
 
 // ── PORTFOLIO SUB-PAGES ───────────────────────────────────────────────────────
+// Hardcoded Instagram reel embed
+function ReelEmbed({code,idx}){
+  const[light,setLight]=useState(false);
+  return(
+    <>
+      {light&&(
+        <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} onClick={()=>setLight(false)}
+          style={{position:"fixed",inset:0,zIndex:999,background:"rgba(0,0,0,.92)",backdropFilter:"blur(12px)",display:"flex",alignItems:"center",justifyContent:"center",padding:16}}>
+          <motion.div initial={{scale:.9,opacity:0}} animate={{scale:1,opacity:1}} onClick={e=>e.stopPropagation()}
+            style={{position:"relative",width:"min(400px,90vw)",aspectRatio:"9/16"}}>
+            <button onClick={()=>setLight(false)} style={{position:"absolute",top:-14,right:-14,zIndex:10,width:32,height:32,background:"var(--card)",border:"2px solid var(--border)",color:"var(--fg)",fontSize:16,display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
+            <iframe src={`https://www.instagram.com/p/${code}/embed/`} style={{width:"100%",height:"100%",border:"none"}} allowFullScreen title={`reel-${idx}`}/>
+          </motion.div>
+        </motion.div>
+      )}
+      <div onClick={()=>setLight(true)} style={{position:"relative",aspectRatio:"9/16",background:"var(--muted)",border:"2px solid var(--border)",overflow:"hidden",cursor:"pointer"}}>
+        <iframe src={`https://www.instagram.com/p/${code}/embed/`} style={{width:"100%",height:"100%",border:"none",pointerEvents:"none"}} title={`reel-thumb-${idx}`}/>
+        <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(0,0,0,0)",transition:"background .2s"}}
+          onMouseEnter={e=>e.currentTarget.style.background="rgba(0,0,0,.4)"}
+          onMouseLeave={e=>e.currentTarget.style.background="rgba(0,0,0,0)"}>
+          <div style={{width:48,height:48,background:"rgba(196,255,77,.9)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,color:"#000"}}>▶</div>
+        </div>
+        <div style={{position:"absolute",top:6,right:6}}>
+          <button onClick={e=>{e.stopPropagation();setLight(true)}} style={{width:28,height:28,background:"rgba(13,13,18,.85)",border:"1px solid var(--border)",color:"var(--fg)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:12}}>⤢</button>
+        </div>
+      </div>
+    </>
+  );
+}
+
 function PortfolioSubPage({title,emoji,description,sections,type,onBack}){
   return(
     <div style={{minHeight:"100vh",background:"var(--bg)",color:"var(--fg)",paddingTop:80}}>
@@ -941,10 +971,7 @@ function PortfolioSubPage({title,emoji,description,sections,type,onBack}){
           <h1 style={{fontFamily:"var(--px)",fontSize:13,textTransform:"uppercase"}}>{title}</h1>
           <div style={{flex:1,height:1,background:"var(--border)"}}/>
         </div>
-        <p style={{fontFamily:"var(--mo)",fontSize:13,color:"var(--mfg)",marginBottom:16,maxWidth:600}}>{description}</p>
-        <div style={{marginBottom:40,display:"inline-flex",alignItems:"center",gap:8,fontFamily:"var(--mo)",fontSize:10,color:"var(--primary)",background:"rgba(196,255,77,.06)",border:"1px solid rgba(196,255,77,.25)",padding:"6px 12px"}}>
-          ✏️ Click any slot to upload — photos save in your browser automatically
-        </div>
+        <p style={{fontFamily:"var(--mo)",fontSize:13,color:"var(--mfg)",marginBottom:40,maxWidth:600}}>{description}</p>
         <div style={{display:"flex",flexDirection:"column",gap:64}}>
           {sections.map((sec,i)=>(
             <motion.div key={sec.title} initial={{opacity:0,y:30}} animate={{opacity:1,y:0}} transition={{duration:.5,delay:i*.1}}>
@@ -953,11 +980,17 @@ function PortfolioSubPage({title,emoji,description,sections,type,onBack}){
                 <div style={{flex:1,height:1,background:"var(--border)"}}/>
               </div>
               <p style={{fontFamily:"var(--mo)",fontSize:11,color:"var(--mfg)",marginBottom:20}}>{sec.description}</p>
-              <div style={{display:"grid",gridTemplateColumns:`repeat(${sec.count<=4?2:3},1fr)`,gap:12}}>
-                {Array.from({length:sec.count}).map((_,j)=>(
-                  <MediaSlot key={`${type}-${sec.title}-${j}`} slotKey={`${type}-${sec.title}-${j}`} type={type==="video"?"video":"image"} idx={j}/>
-                ))}
-              </div>
+              {sec.reels?(
+                <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12}}>
+                  {sec.reels.map((code,j)=><ReelEmbed key={code} code={code} idx={j}/>)}
+                </div>
+              ):(
+                <div style={{display:"grid",gridTemplateColumns:`repeat(${sec.count<=4?2:3},1fr)`,gap:12}}>
+                  {Array.from({length:sec.count}).map((_,j)=>(
+                    <MediaSlot key={`${type}-${sec.title}-${j}`} slotKey={`${type}-${sec.title}-${j}`} type="image" idx={j}/>
+                  ))}
+                </div>
+              )}
             </motion.div>
           ))}
         </div>
@@ -1030,8 +1063,8 @@ const PP={
     {title:"Wildlife",description:"Nature and wildlife photography from personal travels and expeditions.",count:4},
   ]},
   video:{title:"Video_Editing",emoji:"🎬",description:"Short-form video, reels, and edited content produced with Adobe Premiere Pro, CapCut and DJI gimbal.",type:"video",sections:[
-    {title:"Social Media Content",description:"Reels, TikToks, YouTube shorts and branded short-form video.",count:6},
-    {title:"Personal Projects",description:"Personal creative video projects, experimental edits, and passion projects.",count:4},
+    {title:"Social Media Content",description:"Reels, TikToks, YouTube shorts and branded short-form video.",count:6,reels:["DX_0plvAffO","DXoqGS_Deah","DX9GRJORFc5","DXopMxxkZ6x","DWOa6CRke_P","DJoIjVihzoE"]},
+    {title:"Personal Projects",description:"Personal creative video projects, experimental edits, and passion projects.",count:4,reels:["DSFNWYjkneE","DRSHbnSCoUO","C9fEZz4N624","C7KqzwQypTp"]},
   ]},
 };
 
