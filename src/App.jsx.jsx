@@ -41,6 +41,54 @@ const G = () => (
       .contact-grid{grid-template-columns:1fr!important}
       .ws-grid{grid-template-columns:1fr!important}
     }
+
+    /* ── GLASSMORPHISM BUTTONS ── */
+    .glass-btn {
+      background: rgba(196,255,77,0.08) !important;
+      backdrop-filter: blur(12px) !important;
+      -webkit-backdrop-filter: blur(12px) !important;
+      border: 1px solid rgba(196,255,77,0.25) !important;
+      box-shadow: 0 4px 24px rgba(196,255,77,0.08), inset 0 1px 0 rgba(196,255,77,0.15) !important;
+      color: var(--primary) !important;
+      transition: all 0.3s ease !important;
+    }
+    .glass-btn:hover {
+      background: rgba(196,255,77,0.15) !important;
+      border-color: rgba(196,255,77,0.5) !important;
+      box-shadow: 0 4px 32px rgba(196,255,77,0.18), inset 0 1px 0 rgba(196,255,77,0.25) !important;
+      transform: translateY(-1px);
+    }
+    .glass-btn-primary {
+      background: rgba(196,255,77,0.15) !important;
+      backdrop-filter: blur(16px) !important;
+      -webkit-backdrop-filter: blur(16px) !important;
+      border: 1px solid rgba(196,255,77,0.4) !important;
+      box-shadow: 0 4px 24px rgba(196,255,77,0.15), inset 0 1px 0 rgba(255,255,255,0.15), 0 0 0 0 rgba(196,255,77,0.3) !important;
+      color: var(--primary) !important;
+      font-weight: 700 !important;
+      transition: all 0.3s ease !important;
+    }
+    .glass-btn-primary:hover {
+      background: rgba(196,255,77,0.25) !important;
+      border-color: rgba(196,255,77,0.7) !important;
+      box-shadow: 0 6px 36px rgba(196,255,77,0.25), inset 0 1px 0 rgba(255,255,255,0.2), 0 0 20px rgba(196,255,77,0.15) !important;
+      transform: translateY(-2px);
+    }
+    .glass-hire {
+      background: rgba(196,255,77,0.18) !important;
+      backdrop-filter: blur(16px) !important;
+      -webkit-backdrop-filter: blur(16px) !important;
+      border: 1px solid rgba(196,255,77,0.45) !important;
+      box-shadow: 0 4px 20px rgba(196,255,77,0.15), inset 0 1px 0 rgba(255,255,255,0.2) !important;
+      color: var(--primary) !important;
+      font-weight: 700 !important;
+      transition: all 0.3s !important;
+    }
+    .glass-hire:hover {
+      background: rgba(196,255,77,0.28) !important;
+      box-shadow: 0 6px 32px rgba(196,255,77,0.25), 0 0 24px rgba(196,255,77,0.1) !important;
+      transform: translateY(-1px);
+    }
   `}</style>
 );
 
@@ -78,6 +126,13 @@ const TRACKS=[
 ];
 function StickyLofi(){
   const[playing,setPlaying]=useState(true);
+  // Auto-start on first user interaction (browser autoplay policy)
+  useEffect(()=>{
+    const start=()=>{setPlaying(true);document.removeEventListener("click",start);document.removeEventListener("keydown",start)};
+    document.addEventListener("click",start,{once:true});
+    document.addEventListener("keydown",start,{once:true});
+    return()=>{document.removeEventListener("click",start);document.removeEventListener("keydown",start)};
+  },[]);
   const[muted,setMuted]=useState(false);
   const[vol,setVol]=useState(60);
   const[idx,setIdx]=useState(0);
@@ -106,10 +161,10 @@ function StickyLofi(){
               ))}
             </div>
             <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}>
-              <button onClick={()=>setPlaying(p=>!p)} style={{width:32,height:32,background:"var(--primary)",color:"var(--pfg)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,fontWeight:700,flexShrink:0}}>
+              <button onClick={()=>setPlaying(p=>!p)} className="glass-btn-primary" style={{width:32,height:32,display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,flexShrink:0}}>
                 {playing?"⏸":"▶"}
               </button>
-              <button onClick={next} style={{width:32,height:32,border:"1px solid var(--border)",background:"transparent",color:"var(--mfg)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,flexShrink:0}}>⏭</button>
+              <button onClick={next} className="glass-btn" style={{width:32,height:32,display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,flexShrink:0}}>⏭</button>
               <button onClick={()=>setMuted(m=>!m)} style={{background:"transparent",color:"var(--mfg)",fontSize:14,padding:4,flexShrink:0}}>{muted?"🔇":"🔊"}</button>
               <input type="range" min={0} max={100} value={muted?0:vol} onChange={e=>{setVol(+e.target.value);setMuted(false)}} style={{flex:1}}/>
               <span style={{fontFamily:"var(--mo)",fontSize:9,color:"var(--mfg)",minWidth:20}}>{muted?0:vol}</span>
@@ -118,7 +173,7 @@ function StickyLofi(){
         )}
       </AnimatePresence>
       <motion.button whileHover={{scale:1.1}} whileTap={{scale:.95}} onClick={()=>setOpen(o=>!o)}
-        style={{width:48,height:48,background:playing?"var(--primary)":"var(--card)",color:playing?"var(--pfg)":"var(--fg)",border:"2px solid var(--border)",boxShadow:"3px 3px 0 var(--border)",fontSize:20,display:"flex",alignItems:"center",justifyContent:"center",transition:"background .2s,color .2s"}}>
+        className="glass-btn-primary" style={{width:48,height:48,fontSize:20,display:"flex",alignItems:"center",justifyContent:"center"}}>
         🎵
       </motion.button>
     </div>
@@ -154,7 +209,7 @@ function Navbar({onHome}){
         <div style={{maxWidth:1280,margin:"0 auto",padding:"0 32px",display:"flex",alignItems:"center",justifyContent:"space-between",height:64}}>
 
           {/* Logo — always visible */}
-          <a href="#hero" onClick={e=>{if(onHome){e.preventDefault();onHome()}}} style={{display:"flex",alignItems:"center",gap:12,flexShrink:0,cursor:"pointer"}}>
+          <a href="#hero" onClick={e=>{if(onHome){e.preventDefault();onHome();setTimeout(()=>window.scrollTo({top:0,behavior:"smooth"}),300)}}} style={{display:"flex",alignItems:"center",gap:12,flexShrink:0,cursor:"pointer"}}>
             <img src={LOGO_IMG} alt="Truthseeker Logo" style={{width:36,height:36,objectFit:"contain"}} onError={e=>e.target.style.display="none"}/>
             <span style={{fontFamily:"var(--px)",fontSize:10,color:"var(--fg)"}}>{isMobile?"AP":"ASHITOSH.PILLAY"}</span>
           </a>
@@ -163,19 +218,21 @@ function Navbar({onHome}){
           {!isMobile && (
             <nav style={{display:"flex",alignItems:"center",gap:2}}>
               {links.map(({l,h})=>(
-                <a key={l} href={h} style={lStyle}
+                <a key={l} href={h}
+                  onClick={e=>{if(onHome){e.preventDefault();onHome();setTimeout(()=>{const el=document.querySelector(h);if(el)el.scrollIntoView({behavior:"smooth"})},300)}}}
+                  style={lStyle}
                   onMouseEnter={e=>{e.currentTarget.style.color="var(--primary)";e.currentTarget.style.background="rgba(196,255,77,.05)"}}
                   onMouseLeave={e=>{e.currentTarget.style.color="var(--mfg)";e.currentTarget.style.background="transparent"}}>
                   {l}
                 </a>
               ))}
               <a href={CV_URL} target="_blank" rel="noopener noreferrer"
-                style={{...lStyle,display:"flex",alignItems:"center",gap:6}}
+                className="glass-btn" style={{...lStyle,display:"flex",alignItems:"center",gap:6,border:"1px solid rgba(196,255,77,.2)",borderRadius:0,padding:"6px 14px"}}
                 onMouseEnter={e=>{e.currentTarget.style.color="var(--primary)";e.currentTarget.style.background="rgba(196,255,77,.05)"}}
                 onMouseLeave={e=>{e.currentTarget.style.color="var(--mfg)";e.currentTarget.style.background="transparent"}}>
                 ↓ CV
               </a>
-              <a href="#contact" style={{marginLeft:6,fontFamily:"var(--mo)",fontSize:11,textTransform:"uppercase",letterSpacing:2,padding:"8px 18px",background:"var(--primary)",color:"var(--pfg)",border:"2px solid var(--primary)",boxShadow:"2px 2px 0 rgba(196,255,77,.3)",fontWeight:700}}>
+              <a href="#contact" className="glass-hire" onClick={e=>{if(onHome){e.preventDefault();onHome();setTimeout(()=>{const el=document.querySelector("#contact");if(el)el.scrollIntoView({behavior:"smooth"})},300)}}} style={{marginLeft:6,fontFamily:"var(--mo)",fontSize:11,textTransform:"uppercase",letterSpacing:2,padding:"8px 18px",textDecoration:"none",display:"block"}}>
                 Hire Me
               </a>
             </nav>
@@ -297,10 +354,10 @@ function HeroSection(){
               Paid Media · Social Media · Content &amp; Brand Growth.<br/>Building brands that stand out — from Dubai to the world.
             </p>
             <div style={{display:"flex",flexWrap:"wrap",gap:16}} className="hero-btns">
-              <a href="#contact" style={{display:"inline-flex",alignItems:"center",gap:8,fontFamily:"var(--mo)",fontSize:12,textTransform:"uppercase",letterSpacing:2,padding:"14px 24px",background:"var(--primary)",color:"var(--pfg)",fontWeight:700,border:"2px solid var(--primary)",boxShadow:"4px 4px 0 rgba(196,255,77,.3)"}}>
+              <a href="#contact" className="glass-btn-primary" style={{display:"inline-flex",alignItems:"center",gap:8,fontFamily:"var(--mo)",fontSize:12,textTransform:"uppercase",letterSpacing:2,padding:"14px 24px",textDecoration:"none"}}>
                 ✉ [ INITIATE_CONNECTION ]
               </a>
-              <a href={CV_URL} target="_blank" rel="noopener noreferrer" style={{display:"inline-flex",alignItems:"center",gap:8,fontFamily:"var(--mo)",fontSize:12,textTransform:"uppercase",letterSpacing:2,padding:"14px 24px",color:"var(--fg)",border:"2px solid var(--border)",boxShadow:"4px 4px 0 var(--border)"}}>
+              <a href={CV_URL} target="_blank" rel="noopener noreferrer" className="glass-btn" style={{display:"inline-flex",alignItems:"center",gap:8,fontFamily:"var(--mo)",fontSize:12,textTransform:"uppercase",letterSpacing:2,padding:"14px 24px",textDecoration:"none"}}>
                 📄 [ DOWNLOAD_CV ]
               </a>
             </div>
@@ -719,7 +776,7 @@ function ContactSection(){
                         onFocus={e=>e.target.style.borderColor="var(--primary)"}
                         onBlur={e=>e.target.style.borderColor="var(--border)"}/>
                     </div>
-                    <button type="submit" disabled={sending} style={{width:"100%",padding:16,background:"var(--primary)",color:"var(--pfg)",border:"2px solid var(--primary)",fontFamily:"var(--mo)",fontSize:13,textTransform:"uppercase",letterSpacing:3,fontWeight:700,boxShadow:"4px 4px 0 rgba(196,255,77,.3)"}}>
+                    <button type="submit" disabled={sending} className="glass-btn-primary" style={{width:"100%",padding:16,fontFamily:"var(--mo)",fontSize:13,textTransform:"uppercase",letterSpacing:3}}>
                       {sending?"SENDING...":"[ TRANSMIT_MESSAGE ]"}
                     </button>
                   </>
@@ -786,6 +843,13 @@ function saveMedia(d){try{localStorage.setItem(SK,JSON.stringify(d))}catch{}}
 function Lightbox({item,type,onClose}){
   const vidRef=useRef();
   const[playing,setPlaying]=useState(true);
+  // Auto-start on first user interaction (browser autoplay policy)
+  useEffect(()=>{
+    const start=()=>{setPlaying(true);document.removeEventListener("click",start);document.removeEventListener("keydown",start)};
+    document.addEventListener("click",start,{once:true});
+    document.addEventListener("keydown",start,{once:true});
+    return()=>{document.removeEventListener("click",start);document.removeEventListener("keydown",start)};
+  },[]);
   const[progress,setProgress]=useState(0);
   const[duration,setDuration]=useState(0);
 
