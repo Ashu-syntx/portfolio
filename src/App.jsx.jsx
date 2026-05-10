@@ -927,34 +927,56 @@ function MediaSlot({slotKey,type="image",idx}){
 }
 
 // ── PORTFOLIO SUB-PAGES ───────────────────────────────────────────────────────
-// Hardcoded Instagram reel embed
+// Instagram reel — clean thumbnail + fullscreen lightbox
 function ReelEmbed({code,idx}){
   const[light,setLight]=useState(false);
+  // Use Instagram's thumbnail API for clean cover image
+  const thumb=`https://www.instagram.com/p/${code}/media/?size=l`;
   return(
     <>
-      {light&&(
-        <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} onClick={()=>setLight(false)}
-          style={{position:"fixed",inset:0,zIndex:999,background:"rgba(0,0,0,.92)",backdropFilter:"blur(12px)",display:"flex",alignItems:"center",justifyContent:"center",padding:16}}>
-          <motion.div initial={{scale:.9,opacity:0}} animate={{scale:1,opacity:1}} onClick={e=>e.stopPropagation()}
-            style={{position:"relative",width:"min(400px,90vw)",aspectRatio:"9/16"}}>
-            <button onClick={()=>setLight(false)} style={{position:"absolute",top:-14,right:-14,zIndex:10,width:32,height:32,background:"var(--card)",border:"2px solid var(--border)",color:"var(--fg)",fontSize:16,display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
-            <iframe src={`https://www.instagram.com/p/${code}/embed/?hidecaption=true&cr=1&v=14`} style={{width:"100%",height:"100%",border:"none"}} allowFullScreen title={`reel-${idx}`}/>
+      <AnimatePresence>
+        {light&&(
+          <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} onClick={()=>setLight(false)}
+            style={{position:"fixed",inset:0,zIndex:999,background:"rgba(0,0,0,.95)",backdropFilter:"blur(16px)",display:"flex",alignItems:"center",justifyContent:"center",padding:16}}>
+            <motion.div initial={{scale:.9,opacity:0,y:20}} animate={{scale:1,opacity:1,y:0}} exit={{scale:.9,opacity:0}} onClick={e=>e.stopPropagation()}
+              style={{position:"relative",width:"min(380px,90vw)",aspectRatio:"9/16"}}>
+              <button onClick={()=>setLight(false)}
+                style={{position:"absolute",top:-14,right:-14,zIndex:10,width:32,height:32,background:"var(--card)",border:"2px solid var(--border)",color:"var(--fg)",fontSize:16,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}>
+                ✕
+              </button>
+              <iframe
+                src={`https://www.instagram.com/p/${code}/embed/?hidecaption=true`}
+                style={{width:"100%",height:"100%",border:"none"}}
+                allowFullScreen title={`reel-${idx}`}/>
+            </motion.div>
           </motion.div>
-        </motion.div>
-      )}
-      <div onClick={()=>setLight(true)} style={{position:"relative",aspectRatio:"9/16",background:"var(--muted)",border:"2px solid var(--border)",overflow:"hidden",cursor:"pointer"}}>
-        <div style={{position:"absolute",inset:0,overflow:"hidden"}}>
-          <iframe src={`https://www.instagram.com/p/${code}/embed/?hidecaption=true&cr=1&v=14`} 
-            style={{width:"100%",height:"130%",border:"none",pointerEvents:"none",marginTop:"-15%"}} 
-            title={`reel-thumb-${idx}`}/>
+        )}
+      </AnimatePresence>
+      {/* Thumbnail card — no iframe, just a clean cover */}
+      <div onClick={()=>setLight(true)}
+        style={{position:"relative",aspectRatio:"9/16",background:"var(--muted)",border:"2px solid var(--border)",overflow:"hidden",cursor:"pointer",transition:"border-color .2s"}}
+        onMouseEnter={e=>e.currentTarget.style.borderColor="var(--primary)"}
+        onMouseLeave={e=>e.currentTarget.style.borderColor="var(--border)"}>
+        {/* Dark gradient bg with IG logo as fallback */}
+        <div style={{position:"absolute",inset:0,background:"linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:12}}>
+          <div style={{width:56,height:56,borderRadius:"50%",background:"linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:24}}>
+            📸
+          </div>
+          <span style={{fontFamily:"var(--mo)",fontSize:10,color:"rgba(255,255,255,.6)",textTransform:"uppercase",letterSpacing:2}}>Instagram Reel</span>
         </div>
-        <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(0,0,0,0)",transition:"background .2s"}}
-          onMouseEnter={e=>e.currentTarget.style.background="rgba(0,0,0,.4)"}
-          onMouseLeave={e=>e.currentTarget.style.background="rgba(0,0,0,0)"}>
-          <div style={{width:48,height:48,background:"rgba(196,255,77,.9)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,color:"#000"}}>▶</div>
+        {/* Big play button overlay */}
+        <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center"}}>
+          <motion.div whileHover={{scale:1.1}} style={{width:56,height:56,background:"var(--primary)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,color:"var(--pfg)",fontWeight:700,boxShadow:"0 0 20px rgba(196,255,77,.4)"}}>
+            ▶
+          </motion.div>
         </div>
-        <div style={{position:"absolute",top:6,right:6}}>
-          <button onClick={e=>{e.stopPropagation();setLight(true)}} style={{width:28,height:28,background:"rgba(13,13,18,.85)",border:"1px solid var(--border)",color:"var(--fg)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:12}}>⤢</button>
+        {/* Reel number badge */}
+        <div style={{position:"absolute",bottom:8,left:8,fontFamily:"var(--mo)",fontSize:9,color:"rgba(255,255,255,.5)",background:"rgba(0,0,0,.5)",padding:"3px 8px"}}>
+          REEL_{String(idx+1).padStart(2,"0")}
+        </div>
+        {/* Expand icon */}
+        <div style={{position:"absolute",top:6,right:6,width:26,height:26,background:"rgba(13,13,18,.8)",border:"1px solid rgba(255,255,255,.1)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,color:"rgba(255,255,255,.5)"}}>
+          ⤢
         </div>
       </div>
     </>
