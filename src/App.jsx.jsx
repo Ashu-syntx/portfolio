@@ -126,7 +126,6 @@ const TRACKS=[
 ];
 function StickyLofi(){
   const[playing,setPlaying]=useState(true);
-  // Auto-start on first user interaction (browser autoplay policy)
   useEffect(()=>{
     const start=()=>{setPlaying(true);document.removeEventListener("click",start);document.removeEventListener("keydown",start)};
     document.addEventListener("click",start,{once:true});
@@ -142,11 +141,12 @@ function StickyLofi(){
   const next=()=>{setIdx(i=>(i+1)%TRACKS.length);setIkey(k=>k+1);setPlaying(true)};
   return(
     <div style={{position:"fixed",bottom:24,right:24,zIndex:100,display:"flex",flexDirection:"column",alignItems:"flex-end",gap:8}}>
+      {/* iframe ALWAYS mounted so music keeps playing when panel is closed */}
+      {playing&&<iframe key={ikey} src={`${t.url}&mute=${muted?1:0}`} style={{width:0,height:0,position:"fixed",opacity:0,pointerEvents:"none",top:0,left:0}} allow="autoplay" title="lofi"/>}
       <AnimatePresence>
         {open&&(
           <motion.div initial={{opacity:0,y:20,scale:.95}} animate={{opacity:1,y:0,scale:1}} exit={{opacity:0,y:20,scale:.95}} transition={{duration:.2}}
             style={{background:"var(--card)",border:"2px solid var(--border)",boxShadow:"4px 4px 0 var(--border)",padding:16,width:260}}>
-            {playing&&<iframe key={ikey} src={`${t.url}&mute=${muted?1:0}`} style={{width:0,height:0,position:"absolute",opacity:0,pointerEvents:"none"}} allow="autoplay" title="lofi"/>}
             <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
               <div style={{width:8,height:8,borderRadius:"50%",background:playing?"var(--primary)":"var(--mfg)"}} className={playing?"pg2":""}/>
               <span style={{fontFamily:"var(--mo)",fontSize:9,color:"var(--primary)",textTransform:"uppercase",letterSpacing:3}}>{playing?"Now Playing":"Paused"}</span>
@@ -210,7 +210,7 @@ function Navbar({onHome}){
 
           {/* Logo — always visible */}
           <a href="#hero" onClick={e=>{if(onHome){e.preventDefault();onHome();setTimeout(()=>window.scrollTo({top:0,behavior:"smooth"}),300)}}} style={{display:"flex",alignItems:"center",gap:12,flexShrink:0,cursor:"pointer"}}>
-            <img src={LOGO_IMG} alt="Truthseeker Logo" style={{width:36,height:36,objectFit:"contain"}} onError={e=>e.target.style.display="none"}/>
+            <img src={LOGO_IMG} alt="Truthseeker Logo" style={{width:36,height:36,objectFit:"contain"}} onError={e=>{e.target.src="https://media.base44.com/images/public/69fc36365a5bcec05c174ea3/be415776b_truthseeker_full_logo_original.png"}}/>
             <span style={{fontFamily:"var(--px)",fontSize:10,color:"var(--fg)"}}>{isMobile?"AP":"ASHITOSH.PILLAY"}</span>
           </a>
 
@@ -342,7 +342,7 @@ function HeroSection(){
         <div style={{maxWidth:1280,margin:"0 auto",padding:"0 32px",width:"100%"}}>
           <motion.div initial={{opacity:0,y:40}} animate={{opacity:1,y:0}} transition={{duration:.8}} style={{maxWidth:640}}>
             <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:20}}>
-              <img src={LOGO_IMG} alt="Logo" style={{width:38,height:38,objectFit:"contain"}} onError={e=>e.target.style.display="none"}/>
+              <img src={LOGO_IMG} alt="Logo" style={{width:38,height:38,objectFit:"contain"}} onError={e=>{e.target.src="https://media.base44.com/images/public/69fc36365a5bcec05c174ea3/be415776b_truthseeker_full_logo_original.png"}}/>
               <span style={{fontFamily:"var(--mo)",fontSize:11,color:"var(--mfg)",letterSpacing:4,textTransform:"uppercase"}}>v2.0.26</span>
             </div>
             <h1 style={{fontSize:"clamp(52px,9vw,96px)",fontWeight:900,lineHeight:.9,letterSpacing:-2,marginBottom:16}}>
@@ -415,7 +415,7 @@ function AboutSection(){
                 style={{position:"absolute",inset:-36,border:"1px dotted rgba(139,92,246,.1)"}}/>
               <div style={{position:"relative",width:208,height:256,overflow:"hidden",border:"2px solid var(--border)",boxShadow:"6px 6px 0 rgba(196,255,77,.25)"}}>
                 <img src={PROFILE_IMG} alt="Ashitosh Pillay" style={{width:"100%",height:"100%",objectFit:"cover"}}
-                  onError={e=>{e.target.parentElement.innerHTML='<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:var(--muted);font-size:64px;">👤</div>'}}/>
+                  onError={e=>{e.target.src="https://media.base44.com/images/public/69fc36365a5bcec05c174ea3/048476937_IMG_20260506_210356_601.webp"}}/>
                 <div style={{position:"absolute",inset:0,background:"repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.07) 2px,rgba(0,0,0,.07) 4px)",pointerEvents:"none"}}/>
                 <div style={{position:"absolute",bottom:0,left:0,right:0,height:64,background:"linear-gradient(to top,rgba(13,13,18,.7),transparent)"}}/>
               </div>
@@ -734,7 +734,7 @@ function ContactSection(){
               <p style={{color:"var(--mfg)",lineHeight:1.7,maxWidth:400}}>Currently open to new opportunities. Whether it's a project collaboration, a full-time role, or just a chat — I'd love to hear from you.</p>
             </div>
             <div style={{display:"flex",alignItems:"center",gap:16}}>
-              <img src={ENVELOPE_IMG} alt="envelope" style={{width:64,height:64,objectFit:"contain"}} onError={e=>e.target.style.display="none"}/>
+              <img src={ENVELOPE_IMG} alt="envelope" style={{width:64,height:64,objectFit:"contain"}} onError={e=>{e.target.src="https://media.base44.com/images/public/69fc36365a5bcec05c174ea3/be415776b_truthseeker_full_logo_original.png"}}/>
               <div>
                 <div style={{fontFamily:"var(--mo)",fontSize:12,color:"var(--mfg)"}}>📍 Dubai, UAE</div>
                 <a href="mailto:ashitoshgpillay@gmail.com" style={{fontFamily:"var(--mo)",fontSize:12,color:"var(--primary)",display:"block",marginTop:4}}>ashitoshgpillay@gmail.com</a>
@@ -796,7 +796,7 @@ function Footer(){
     <footer style={{borderTop:"2px solid var(--border)",padding:"32px 32px"}}>
       <div style={{maxWidth:1280,margin:"0 auto",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:16}}>
         <div style={{display:"flex",alignItems:"center",gap:12}}>
-          <img src={LOGO_IMG} alt="AP" style={{width:24,height:24,objectFit:"contain"}} onError={e=>e.target.style.display="none"}/>
+          <img src={LOGO_IMG} alt="AP" style={{width:24,height:24,objectFit:"contain"}} onError={e=>{e.target.src="https://media.base44.com/images/public/69fc36365a5bcec05c174ea3/be415776b_truthseeker_full_logo_original.png"}}/>
           <span style={{fontFamily:"var(--mo)",fontSize:11,color:"var(--mfg)"}}>© {new Date().getFullYear()} Ashitosh Pillay. All rights reserved.</span>
         </div>
         <span style={{fontFamily:"var(--px)",fontSize:9,color:"var(--primary)"}}>PIXELS &amp; PASSION</span>
